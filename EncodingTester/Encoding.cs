@@ -44,21 +44,25 @@ namespace EncodingTester
         static Encoding()
         {
             BuiltinEncodings = new System.Collections.Generic.List<EncodingAttribute>();
+            foreach (EncodingAttribute attr in GetEncodingsInAssembly(System.Reflection.Assembly.GetExecutingAssembly()))
+            {
+                if (BuiltinEncodings.Contains(attr))
+                    throw new ApplicationException("Error while loading built-in encoding with name '" + attr.Name + "' and type '" + attr.EncoderType.FullName + "': Encoding with name already exists.");
+                BuiltinEncodings.Add(attr);
+            }
+        }
+
+        public static System.Collections.Generic.IEnumerable<EncodingAttribute> GetEncodingsInAssembly(System.Reflection.Assembly assembly)
+        {
             object[] attributeObjects;
-            Type[] types;
-            types = System.Reflection.Assembly.GetExecutingAssembly().GetTypes();
+            Type[] types = assembly.GetTypes();
             for (int i = 0; i < types.Length; i++)
             {
                 attributeObjects = types[i].GetCustomAttributes(true);
                 for (int j = 0; j < attributeObjects.Length; j++)
                 {
                     if (attributeObjects[j] is EncodingAttribute)
-                    {
-                        EncodingAttribute attr = attributeObjects[j] as EncodingAttribute;
-                        if (BuiltinEncodings.Contains(attr))
-                            throw new ApplicationException("Error while loading built-in encoding with name '" + attr.Name + "' and type '" + attr.EncoderType.FullName + "': Encoding with name already exists.");
-                        BuiltinEncodings.Add(attr);
-                    }
+                        yield return attributeObjects[j] as EncodingAttribute;
                 }
             }
         }

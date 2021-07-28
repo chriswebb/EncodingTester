@@ -27,6 +27,7 @@ namespace EncodingTester
                         string results = await reader.ReadToEndAsync();
                         byte[] bytes = Convert.FromBase64String(results);
                         await outputStream.WriteAsync(bytes, 0, bytes.Length);
+                        await outputStream.FlushAsync();
                         outputStream.Seek(0, SeekOrigin.Begin);
                         return new Tuple<MemoryStream, System.Text.Encoding>(outputStream, null);
                     }
@@ -56,6 +57,7 @@ namespace EncodingTester
                     string encodedString = Convert.ToBase64String(bytes);
                     bytes = this.FinalEncoding.GetBytes(encodedString);
                     await outputStream.WriteAsync(bytes, 0, bytes.Length);
+                    await outputStream.FlushAsync();
                     outputStream.Seek(0, SeekOrigin.Begin);
                     return new Tuple<MemoryStream, System.Text.Encoding>(outputStream, null);
                 }

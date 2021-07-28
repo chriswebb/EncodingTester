@@ -204,6 +204,7 @@ namespace EncodingTester
                             using (System.IO.FileStream fileStream = inputFile.OpenRead())
                             {
                                 await fileStream.CopyToAsync(stream);
+                                await fileStream.FlushAsync();
                             }
                         }
                         else if (inputData is string && !String.IsNullOrWhiteSpace((string)inputData))
@@ -212,10 +213,10 @@ namespace EncodingTester
                             using (System.IO.StreamWriter writer = new System.IO.StreamWriter(stream, System.Text.Encoding.UTF8, inputText.Length, true))
                             {
                                 await writer.WriteAsync(inputText);
+                                await writer.FlushAsync();
                             }
                         }
 
-                        await Task.Delay(500);
                         stream.Seek(0, System.IO.SeekOrigin.Begin);
 
                         if (isEncode)
